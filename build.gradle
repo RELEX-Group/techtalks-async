@@ -1,0 +1,20 @@
+allprojects {
+
+  apply {
+    plugin 'java'
+  }
+
+  ext {
+    jackson_ver = '2.9.7'
+    spring_boot_ver = '2.1.1.RELEASE'
+  }
+
+  group = 'ru.relex.techtalks'
+  version = '0.0.1-SNAPSHOT'
+  sourceCompatibility = 11
+
+  repositories {
+    mavenCentral()
+  }
+
+}

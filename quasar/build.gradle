@@ -1,0 +1,80 @@
+buildscript {
+  ext {
+    springBootVersion = '1.5.18.RELEASE'
+  }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'ru.relex.techtalk2'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+  mavenCentral()
+}
+
+configurations {
+  quasar
+  scan
+}
+
+configurations.all {
+  resolutionStrategy.eachDependency {
+    if (it.requested.name == 'postgresql') {
+      it.useTarget 'org.postgresql:postgresql:42.2.5'
+    }
+  }
+}
+
+dependencies {
+  compile(project(":core"))
+  compile('org.springframework.boot:spring-boot-starter-web')
+  compile("org.springframework.boot:spring-boot-starter-actuator")
+  compile('co.paralleluniverse:quasar-core:0.8.0@jar')
+  compile('co.paralleluniverse:comsat-spring-boot:0.7.0')
+  compile('com.esotericsoftware:kryo:5.0.0-RC1')
+  compile 'io.projectreactor:reactor-core:3.2.3.RELEASE'
+
+  testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+  quasar('co.paralleluniverse:quasar-core:0.8.0@jar')
+}
+
+classes {
+  doFirst {
+    ant.taskdef(name: 'scanSuspendables',
+      classname: 'co.paralleluniverse.fibers.instrument.SuspendablesScanner',
+      classpath: "build/classes/main:build/resources/main:${configurations.runtime.asPath}")
+    ant.scanSuspendables(auto: true,
+      suspendablesFile: "$sourceSets.main.output.resourcesDir/META-INF/suspendables",
+      supersFile: "$sourceSets.main.output.resourcesDir/META-INF/suspendable-supers",
+      append: true) {
+      fileset(dir: sourceSets.main.output.classesDir)
+    }
+  }
+}
+
+tasks {
+  bootRun {
+    //, "-Dco.paralleluniverse.fibers.verifyInstrumentation=true"
+    jvmArgs = [
+      "-javaagent:${configurations.quasar.singleFile}",
+      "-Dcom.sun.management.jmxremote",
+      "-Dcom.sun.management.jmxremote.port=9000",
+      "-Dcom.sun.management.jmxremote.ssl=false",
+      "-Dcom.sun.management.jmxremote.authenticate=false"
+    ]
+  }
+}
+

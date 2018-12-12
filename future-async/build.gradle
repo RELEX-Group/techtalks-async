@@ -1,0 +1,25 @@
+plugins {
+  id 'org.springframework.boot' version '2.1.1.RELEASE'
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+  implementation project(":core")
+  implementation 'io.projectreactor:reactor-core:3.2.3.RELEASE'
+  implementation "org.springframework.boot:spring-boot-starter-web:$spring_boot_ver"
+  compile("org.springframework.boot:spring-boot-starter-actuator")
+}
+
+tasks {
+  bootRun {
+    jvmArgs = [
+      "-Dcom.sun.management.jmxremote",
+      "-Dcom.sun.management.jmxremote.port=9000",
+      "-Dcom.sun.management.jmxremote.ssl=false",
+      "-Dcom.sun.management.jmxremote.authenticate=false"
+    ]
+  }
+}
+

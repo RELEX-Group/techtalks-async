@@ -1,0 +1,11 @@
+rootProject.name = 'async'
+
+include 'future-async'
+include 'kotlin'
+include 'quasar'
+include 'core'
+include 'rx'
+include 'simple'
+
+include 'insurance-stub'
+include 'hospital-stub'
